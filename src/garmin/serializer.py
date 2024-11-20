@@ -15,9 +15,9 @@ class GarminSerializer:
     def serialize(self, workout: Workout) -> dict:
         payload = {
             "sportType": {
-                "sportTypeId": workout.type.value,
+                "sportTypeId": workout.type.id,
                 "sportTypeKey": workout.type.key,
-                "displayOrder": workout.type.value,
+                "displayOrder": workout.type.id,
             },
             "subSportType": None,
             "workoutName": workout.name,
@@ -32,9 +32,9 @@ class GarminSerializer:
         segment = {
             "segmentOrder": 1,
             "sportType": {
-                "sportTypeId": workout.type.value,
+                "sportTypeId": workout.type.id,
                 "sportTypeKey": workout.type.key,
-                "displayOrder": workout.type.value,
+                "displayOrder": workout.type.id,
             },
             "workoutSteps": [],
         }
@@ -61,9 +61,9 @@ class GarminSerializer:
             "stepId": self.step_order,
             "stepOrder": self.step_order,
             "stepType": {
-                "stepTypeId": step.step_type.value,
+                "stepTypeId": step.step_type.id,
                 "stepTypeKey": step.step_type.key,
-                "displayOrder": step.step_type.value,
+                "displayOrder": step.step_type.id,
             },
             "endCondition": {
                 "conditionTypeId": step.condition.id,
@@ -73,12 +73,17 @@ class GarminSerializer:
             },
             "endConditionValue": step.condition.value,
             "description": step.description,
+            "targetType": None,
         }
 
         if isinstance(step.target, HeartRateZoneTarget):
             payload.update(
                 {
-                    "targetType": step.target.type.key,
+                    "targetType": {
+                        "workoutTargetTypeId": step.target.type.id,
+                        "workoutTargetTypeKey": step.target.type.key,
+                        "displayOrder": step.target.type.id,
+                    },
                     "targetValueOne": step.target.values[0],
                     "targetValueTwo": step.target.values[1],
                 }
@@ -96,9 +101,9 @@ class GarminSerializer:
             "stepId": self.step_order,
             "stepOrder": self.step_order,
             "stepType": {
-                "stepTypeId": step.step_type.value,
+                "stepTypeId": step.step_type.id,
                 "stepTypeKey": step.step_type.key,
-                "displayOrder": step.step_type.value,
+                "displayOrder": step.step_type.id,
             },
             "numberOfIterations": step.iterations,
             "smartRepeat": False,

@@ -33,6 +33,6 @@ class Distance(Condition[float]):
     The Distance class represents the distance of a workout step in kilometers.
     """
     def __init__(self, distance: str) -> None:
-        self.id = 1
+        self.id = 3
         self.type = "distance"
         self.value = float(distance.replace(",", ".")) * 1000

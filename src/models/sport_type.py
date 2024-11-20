@@ -8,6 +8,6 @@ class SportType(Enum):
     Strength = ("strength_training", 5)
     Cardio = ("cardio_training", 6)
     
-    def __init__(self, key: str, id: int):
+    def __init__(self, key: str, id: int) -> None:
         self.key = key
         self.id = id

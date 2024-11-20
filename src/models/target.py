@@ -13,7 +13,7 @@ class Target(ABC):
     values: List[int]
     unit: str
 
-    def __init__(self, values: List[int]):
+    def __init__(self, values: List[int]) -> None:
         if len(values) != 2:
             raise ValueError("Target values must have exactly 2 elements")
         self.values = values
@@ -24,7 +24,7 @@ class HeartRateZoneTarget(Target):
     The HeartRateZoneTarget class represents a target that is based on heart rate zones.
     """
 
-    def __init__(self, values: List[int]):
+    def __init__(self, values: List[int]) -> None:
         super().__init__(values)
         self.type = TargetType.HeartRate
         self.unit = "bpm"
@@ -35,5 +35,5 @@ class NoTarget(Target):
     The NoTarget class represents a target that is based on heart rate zones.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.type = TargetType.NoTarget

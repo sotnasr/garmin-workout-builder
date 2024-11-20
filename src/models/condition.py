@@ -22,7 +22,7 @@ class Duration(Condition[int]):
     """
     The Duration class represents the duration of a workout step in seconds.
     """
-    def __init__(self, duration: str):
+    def __init__(self, duration: str) -> None:
         self.id = 2
         self.type = "time"
         self.value = int(duration) * 60
@@ -32,7 +32,7 @@ class Distance(Condition[float]):
     """
     The Distance class represents the distance of a workout step in kilometers.
     """
-    def __init__(self, distance: str):
+    def __init__(self, distance: str) -> None:
         self.id = 1
         self.type = "distance"
         self.value = float(distance.replace(",", ".")) * 1000

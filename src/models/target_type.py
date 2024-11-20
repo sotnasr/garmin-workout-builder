@@ -9,6 +9,6 @@ class TargetType(Enum):
     Speed = ("speed.zone", 5)
     Pace = ("pace.zone", 6)
     
-    def __init__(self, key: str, id: int):
+    def __init__(self, key: str, id: int) -> None:
         self.key = key
         self.id = id

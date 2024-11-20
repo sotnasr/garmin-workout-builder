@@ -9,6 +9,6 @@ class StepType(Enum):
     Rest = ("rest", 5)
     Repeat = ("repeat", 6)
     
-    def __init__(self, key: str, id: int):
+    def __init__(self, key: str, id: int) -> None:
         self.key = key
         self.id = id

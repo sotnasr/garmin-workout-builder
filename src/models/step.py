@@ -15,7 +15,7 @@ class Step:
                  description: str,
                  step_type: StepType,
                  target: Target = None,
-                 condition: Condition = None):        
+                 condition: Condition = None) -> None:
         self.step_name = step_name
         self.description = description
         self.condition = condition

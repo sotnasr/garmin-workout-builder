@@ -15,7 +15,7 @@ class Workout:
     
     def __init__(self,
                  name: str,
-                 type: SportType = SportType.Running):
+                 type: SportType = SportType.Running) -> None:
         self.name: str = name
         self.type: SportType = type
         self.steps: List[Union[Step, RepeatedStep]] = []

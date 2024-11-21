@@ -6,7 +6,10 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY /src .
+
+ARG GARMIN_CLIENT_ID
+ARG GARMIN_CLIENT_SECRET
 
 EXPOSE 8000
 

@@ -1,0 +1,1 @@
+from routes.v1.workout.route import router as workout_router

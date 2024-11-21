@@ -9,7 +9,7 @@ class GarminSerializer:
     The GarminSerializer class serializes a Workout object into the JSON format required by Garmin Connect.
     """
 
-    def __init__(self, ) -> None:
+    def __init__(self) -> None:
         self.step_order = 1
 
     def serialize(self, workout: Workout) -> dict:

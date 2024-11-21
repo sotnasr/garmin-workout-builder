@@ -8,9 +8,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY /src .
 
-ARG GARMIN_CLIENT_ID
-ARG GARMIN_CLIENT_SECRET
-
 EXPOSE 8000
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

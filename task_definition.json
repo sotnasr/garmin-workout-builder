@@ -1,0 +1,20 @@
+{
+    "executionRoleArn": "arn:aws:iam::123456789:role/EcsGaRole",
+    "containerDefinitions": [{
+      "name": "garmin-workflow-builder",
+      "image": "dkr.ecr.eu-west-2.amazonaws.com/personal-apps",
+      "memory": "1024",
+      "essential": true,
+      "portMappings": [{
+        "containerPort": 80,
+        "protocol": "tcp"
+      }]
+    }],
+    "volumes": [],
+    "requiresCompatibilities": ["FARGATE"],
+    "networkMode": "awsvpc",
+    "placementConstraints": [],
+    "family": "application-stack",
+    "memory": "1024",
+    "cpu": "1024"
+  }

@@ -12,7 +12,7 @@ from parser.parser import Parser
 router = APIRouter()
 
 @router.put(
-    "/parse/{workout_expr}",
+    "/parse/create",
     description="Parses a workout expression and creates a workout in Garmin Connect."
 )
 async def parse_and_create_workout(

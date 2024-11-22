@@ -57,11 +57,13 @@ class RunFunParser(Parser):
     """
 
     PATTERN_TOKEN = r"\d+x\([^\)]+\)|\d+(?:,\d+)?km(?:ritmodeprova\d+km)?|\d+\'[a-zA-Z]+"
-    PATTERN_DISTANCE = r"(\d+(?:,\d+)?)km\s*(?:ritmo\s*de\s*prova\s*(\d+)km)?"
+    PATTERN_DISTANCE = r"(\d+(?:,\d+)?)(km|m)\s*(?:ritmo\s*de\s*prova\s*(\d+)(km|m))?"
     PATTERN_DURATION = r"(\d+)'([a-zA-Z]+)"
     PATTERN_REPEAT = r"(\d+)x\(([^\)]+)\)"
+    PATTERN_HEART_RATE_ZONE = r"\b(zr|zm|zs|ze|zt)\b"
 
     def parse(self, value: str) -> Workout:
+        value = self._normalize_heart_rate_zones(value)
         workout = Workout(value)
         steps = self._parse_tokens(self._tokenize(value))
 
@@ -69,6 +71,10 @@ class RunFunParser(Parser):
             workout.add_step(step)
 
         return workout
+
+    def _normalize_heart_rate_zones(self, value: str) -> str:
+        normalized = value.replace("'", "")
+        return re.sub(self.PATTERN_HEART_RATE_ZONE, r"'\1", normalized)
 
     def _tokenize(self, value: str) -> List[str]:
         normalized = value.replace(" ", "")
@@ -83,10 +89,12 @@ class RunFunParser(Parser):
             
             if re.match(self.PATTERN_DISTANCE, token):
                 m = re.match(self.PATTERN_DISTANCE, token)
-                distance, race_pace = m.groups()
+                distance = m.groups()[0] # Pace not implemented yet
+                unit = "km" if "km" in token else "m"
+                
                 steps.append(Step(
-                    step_name=f"{distance}km",
-                    description=f"Run {distance} kilometers",
+                    step_name=f"{distance}{unit}",
+                    description=f"Run {distance} {unit}",
                     condition=Distance(distance),
                     step_type=step_type
                 ))

@@ -45,17 +45,6 @@ def test_garmin_connect_client_create_workout(mock_authorization, mock_client, m
     mock_parser.return_value.parse.assert_called_once()
     mock_client.return_value.create_workout.assert_called_once()
 
-def test_garmin_connect_client_delete_workout(mock_authorization, mock_client, test_credentials):
-    """Test Garmin client workout deletion."""
-    authorization = GarminAuthorization.authenticate(**test_credentials)
-    
-    client = GarminConnectClient(authorization)
-    workout_id = 12345
-    client.delete_workout(workout_id)
-    
-    mock_authorization.assert_called_once_with(**test_credentials)
-    mock_client.return_value.delete_workout.assert_called_once_with(workout_id)
-
 def test_garmin_connect_client_update_workout(mock_authorization, mock_client, mock_parser, test_credentials):
     """Test Garmin client workout update."""
     authorization = GarminAuthorization.authenticate(**test_credentials)

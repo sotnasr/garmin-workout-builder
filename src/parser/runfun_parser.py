@@ -2,6 +2,7 @@ import re
 from typing import List, Union
 
 from models.condition import Distance, Duration
+from models.distance_type import DistanceType
 from models.sport_type import SportType
 from models.step import RepeatedStep, Step, StepType
 from models.target import HeartRateZoneTarget
@@ -63,72 +64,99 @@ class RunFunParser(Parser):
     PATTERN_HEART_RATE_ZONE = r"\b(zr|zm|zs|ze|zt)\b"
 
     def parse(self, value: str) -> Workout:
-        value = self._normalize_heart_rate_zones(value)
+        value = self.normalize_heart_rate_zones(value)
         workout = Workout(value)
-        steps = self._parse_tokens(self._tokenize(value))
+        steps = self.parse_tokens(self.tokenize(value))
 
         for step in steps:
             workout.add_step(step)
 
         return workout
 
-    def _normalize_heart_rate_zones(self, value: str) -> str:
-        normalized = value.replace("'", "")
+    def normalize_heart_rate_zones(self, value: str) -> str:
+        normalized = re.sub(r"\'", "", value)
         return re.sub(self.PATTERN_HEART_RATE_ZONE, r"'\1", normalized)
 
-    def _tokenize(self, value: str) -> List[str]:
+    def tokenize(self, value: str) -> List[str]:
         normalized = value.replace(" ", "")
         return re.findall(self.PATTERN_TOKEN, normalized)
 
-    def _parse_tokens(self, tokens: List[str]) -> List[Union[Step, RepeatedStep]]:
+    def parse_tokens(self, tokens: List[str], repeated: bool = False) -> List[Union[Step, RepeatedStep]]:
         steps = []
         total_steps = len(tokens)
 
         for position, token in enumerate(tokens):
-            step_type = self._get_step_type(position, total_steps)
-            
-            if re.match(self.PATTERN_DISTANCE, token):
-                m = re.match(self.PATTERN_DISTANCE, token)
-                distance = m.groups()[0] # Pace not implemented yet
-                unit = "km" if "km" in token else "m"
-                
-                steps.append(Step(
-                    step_name=f"{distance}{unit}",
-                    description=f"Run {distance} {unit}",
-                    condition=Distance(distance),
-                    step_type=step_type
-                ))
-            elif re.match(self.PATTERN_DURATION, token):
-                m = re.match(self.PATTERN_DURATION, token)
-                duration, zone = m.groups()
-                if not HeartRateZoneConfig.validate_zone(zone.upper()):
-                    raise ValueError(f"Invalid heart rate zone: {zone}")
-                steps.append(Step(
-                    step_name=f"{duration}' {zone}",
-                    description=f"Run for {duration} minutes in {zone} zone",
-                    condition=Duration(duration),
-                    step_type=step_type,
-                    target=HeartRateZoneTarget(HeartRateZoneConfig.get_zone_range(zone.upper()))
-                ))
-            elif re.match(self.PATTERN_REPEAT, token):
-                m = re.match(self.PATTERN_REPEAT, token)
-                repeat_count, repeat_token = m.groups()
-                inner_tokens = re.split(r"\s*\+\s*", repeat_token)
-                repeat_steps = self._parse_tokens(inner_tokens)
-                
-                steps.append(RepeatedStep(
-                    iterations=int(repeat_count),
-                    steps=repeat_steps
-                ))
-            else:
-                raise ValueError(f"The token {token} could not be recognized.")
+            step_type = self.get_step_type(position, total_steps, repeated)
+            step = self._parse_single_token(token, step_type)
+            steps.append(step)
 
         return steps
 
+    def _parse_single_token(self, token: str, step_type: StepType) -> Union[Step, RepeatedStep]:
+        if re.match(self.PATTERN_DISTANCE, token):
+            return self._create_distance_step(token, step_type)
+        elif re.match(self.PATTERN_DURATION, token):
+            return self._create_duration_step(token, step_type)
+        elif re.match(self.PATTERN_REPEAT, token):
+            return self._create_repeated_step(token)
+        else:
+            raise ValueError(f"The token {token} could not be recognized.")
+
+    def _create_distance_step(self, token: str, step_type: StepType) -> Step:
+        m = re.match(self.PATTERN_DISTANCE, token)
+        distance, unit = m.groups()[:2]
+        
+        distance_type = {
+            "km": DistanceType.KILOMETERS,
+            "m": DistanceType.METERS
+        }.get(unit, None)
+
+        if not distance_type:
+            raise ValueError(f"Invalid unit: {unit}")
+
+        return Step(
+            step_name=f"{distance}{unit}",
+            description=f"Run {distance} {unit}",
+            condition=Distance(distance, distance_type),
+            step_type=step_type
+        )
+
+    def _create_duration_step(self, token: str, step_type: StepType) -> Step:
+        m = re.match(self.PATTERN_DURATION, token)
+        duration, zone = m.groups()
+        
+        if not HeartRateZoneConfig.validate_zone(zone.upper()):
+            raise ValueError(f"Invalid heart rate zone: {zone}")
+
+        return Step(
+            step_name=f"{duration}' {zone}",
+            description=f"Run for {duration} minutes in {zone} zone",
+            condition=Duration(duration),
+            step_type=step_type,
+            target=HeartRateZoneTarget(HeartRateZoneConfig.get_zone_range(zone.upper()))
+        )
+
+    def _create_repeated_step(self, token: str) -> RepeatedStep:
+        m = re.match(self.PATTERN_REPEAT, token)
+        repeat_count, repeat_token = m.groups()
+        inner_tokens = re.split(r"\s*\+\s*", repeat_token)
+        repeat_steps = self.parse_tokens(inner_tokens, True)
+        
+        return RepeatedStep(
+            iterations=int(repeat_count),
+            steps=repeat_steps
+        )
+
     @staticmethod
-    def _get_step_type(position: int, total_steps: int) -> StepType:
-        if position == 0:
-            return StepType.WarmUp
-        if position == total_steps - 1:
-            return StepType.CoolDown
+    def get_step_type(position: int, total_steps: int, repeated: bool = False) -> StepType:
+        if repeated:
+            if position == 0:
+                return StepType.Interval
+            elif position == total_steps - 1:
+                return StepType.Recovery
+        else:
+            if position == 0:
+                return StepType.WarmUp
+            elif position == total_steps - 1:
+                return StepType.CoolDown
         return StepType.Interval

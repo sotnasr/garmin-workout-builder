@@ -1,6 +1,8 @@
 from abc import ABC
 from typing import TypeVar, Generic
 
+from models.distance_type import DistanceType
+
 
 T = TypeVar('T')
 
@@ -30,9 +32,22 @@ class Duration(Condition[int]):
 
 class Distance(Condition[float]):
     """
-    The Distance class represents the distance of a workout step in kilometers.
+    The Distance class represents a condition based on the distance for a workout step.
+    
+    Attributes:
+        id (int): The identifier for the distance condition, set to 3.
+        type (str): The type of condition, set to "distance".
+        value (float): The distance value in meters, converted from a string input in kilometers.
+
+    Args:
+        distance (str): The distance of the workout step as a string, which can include a comma or a dot as the decimal separator.
+        type (DistanceType): The type of distance condition.
     """
-    def __init__(self, distance: str) -> None:
+    def __init__(self, distance: str, type: DistanceType) -> None:
         self.id = 3
         self.type = "distance"
-        self.value = float(distance.replace(",", ".")) * 1000
+        
+        if type == DistanceType.KILOMETERS:
+            self.value = float(distance.replace(",", ".")) * 1000
+        elif type == DistanceType.METERS:
+            self.value = float(f"0.{distance.replace(',', '')}")

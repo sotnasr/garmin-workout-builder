@@ -43,8 +43,8 @@ jobs:
           GARMIN_CLIENT_SECRET: ${{ secrets.GARMIN_CLIENT_SECRET }}
         run: |
           gcloud run deploy garmin-workout-builder \
-            --image gcr.io/${{ env.PROJECT_ID }}/garmin-workout-builder \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/garmin-workout-builder \
             --platform managed \
             --region us-central1 \
             --allow-unauthenticated \
-            --set-env-vars="GARMIN_CLIENT_ID=${{ env.GARMIN_CLIENT_ID }},GARMIN_CLIENT_SECRET=${{ env.GARMIN_CLIENT_SECRET }}"
+            --set-env-vars="GARMIN_CLIENT_ID=${{ secrets.GARMIN_CLIENT_ID }},GARMIN_CLIENT_SECRET=${{ secrets.GARMIN_CLIENT_SECRET }}"

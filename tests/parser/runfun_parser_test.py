@@ -85,7 +85,7 @@ def test_parse_with_distance_and_pace(parser):
 
 def test_parse_with_repeats_and_distance(parser):
     """Test parsing workout with repeats and distance: 10' zr + 5x (400m ze + 1' ra) + 15' zr"""
-    workout = parser.parse("10' zr + 5x (400m ze + 1' ra) + 15' zr")
+    workout = parser.parse("10' zr + 5x (400m ze + 1' zr) + 15' zr")
     
     assert len(workout.steps) == 3
     # First step

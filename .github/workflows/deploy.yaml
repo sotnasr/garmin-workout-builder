@@ -31,7 +31,11 @@ jobs:
         env:
           PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: |
-          gcloud builds submit --tag gcr.io/${{ env.PROJECT_ID }}/garmin-workout-builder --timeout=1800s --verbosity=debug
+          gcloud builds submit \
+          --tag gcr.io/${{ env.PROJECT_ID }}/garmin-workout-builder \
+          --timeout=1800s \
+          --async \
+          --verbosity=debug
 
       - name: Verify image exists
         env:
